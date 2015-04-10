@@ -37,8 +37,8 @@ public class AdsConfiguratorHelper {
     private static final String PERMISSIONBASE = "dc=permissions,dc=SMART_recette,ou=Projects,dc=dit,dc=de";
     private static final String USERBASE = "ou=People,dc=dit,dc=de";
 
-    public static final String LDAPURL = "ldap://a7sw303.am.agf.fr:40389";
-    public static final String SSLURL = "ldap://a7sw303.am.agf.fr:40636";
+    public static final String LDAPURL = "ldap://adsdev1.agieurope-intra.eu:40389";
+    public static final String SSLURL = "ldap://adsdev1.agieurope-intra.eu:40636";
 
     // ------------------------------------------------------------------------------------------------
     // Static configuration
