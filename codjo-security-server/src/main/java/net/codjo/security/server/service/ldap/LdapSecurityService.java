@@ -32,6 +32,9 @@ public class LdapSecurityService extends AbstractSecurityService {
     public static final String CONFIG_LDAP_POSTFIX_OTHER = "LdapSecurityService.ldap.%s.postfix";
     public static final String CONFIG_BACKUP_SERVERS_OTHER = "LdapSecurityService.ldap.%s.backup-servers";
 
+    static final String DEFAULT_LDAP_POSTFIX = "@EU1.1CORP.ORG";
+    static final String DEFAULT_LDAP_URL = "ldap://PFM1EU-DC33:389";
+
     private final UserFactory userFactory;
     private final SecurityContextFactory securityContextFactory;
     private Map<String, Ldap> ldaps;
@@ -60,8 +63,8 @@ public class LdapSecurityService extends AbstractSecurityService {
 
     private static Map<String, Ldap> loadLdapProperties(ContainerConfiguration configuration) {
         Ldap defaultLdap = new Ldap();
-        defaultLdap.setLoginPostFix(get(configuration, CONFIG_LDAP_POSTFIX_DEFAULT, "@AM.AGF.FR"));
-        defaultLdap.setServerUrl(get(configuration, CONFIG_LDAP_URL_DEFAULT, "ldap://a7sw302:389"));
+        defaultLdap.setLoginPostFix(get(configuration, CONFIG_LDAP_POSTFIX_DEFAULT, DEFAULT_LDAP_POSTFIX));
+        defaultLdap.setServerUrl(get(configuration, CONFIG_LDAP_URL_DEFAULT, DEFAULT_LDAP_URL));
 
         Map<String, Ldap> ldaps = new HashMap<String, Ldap>();
         ldaps.put(DEFAULT_LDAP, defaultLdap);

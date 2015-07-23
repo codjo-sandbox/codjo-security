@@ -128,7 +128,7 @@ class Ldap {
     void fastBind(String login, String password) throws NamingException {
         env.put(Context.INITIAL_CONTEXT_FACTORY, "com.sun.jndi.ldap.LdapCtxFactory");
         env.put(Context.SECURITY_AUTHENTICATION, "simple");
-        env.put(Context.PROVIDER_URL, "ldap://a7sw302:389");
+        env.put(Context.PROVIDER_URL, "ldap://PFM1EU-DC33:389");
 
         Control[] connCtls = new Control[]{new FastBindConnectionControl()};
 

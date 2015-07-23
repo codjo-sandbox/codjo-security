@@ -16,6 +16,8 @@ import net.codjo.test.common.LogString;
 import net.codjo.test.common.matcher.JUnitMatchers;
 import org.junit.Test;
 
+import static net.codjo.security.server.service.ldap.LdapSecurityService.DEFAULT_LDAP_POSTFIX;
+import static net.codjo.security.server.service.ldap.LdapSecurityService.DEFAULT_LDAP_URL;
 import static net.codjo.security.server.service.ldap.LdapSecurityService.assertConfigurationIsValid;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
@@ -25,17 +27,23 @@ import static org.junit.Assert.fail;
  */
 public class LdapSecurityServiceTest {
 
+    private static final String INVALID_LDAP = "ldap://anyLdap:6969";
+    private static final String INVALID_POSTFIX = "@anyDomain.com";
+    private static final String LDAP_URL1 = "ldap://anyLdap1:9696";
+    private static final String LDAP_URL2 = "ldap://anyLdap2:9696";
+
+
     @Test
     public void test_configuration() throws Exception {
         ContainerConfiguration configuration = new ContainerConfiguration();
-        configuration.setParameter(LdapSecurityService.CONFIG_LDAP_URL_DEFAULT, "ldap://a7sw302:6969");
-        configuration.setParameter(LdapSecurityService.CONFIG_LDAP_POSTFIX_DEFAULT, "@google.fr");
+        configuration.setParameter(LdapSecurityService.CONFIG_LDAP_URL_DEFAULT, INVALID_LDAP);
+        configuration.setParameter(LdapSecurityService.CONFIG_LDAP_POSTFIX_DEFAULT, INVALID_POSTFIX);
 
         LdapSecurityService securityService = createService(configuration);
         Ldap defaultLDap = securityService.getLdaps().get(LdapSecurityService.DEFAULT_LDAP);
         assertEquals(Ldap.LDAP_FACTORY, defaultLDap.getContextFactory());
-        assertEquals("ldap://a7sw302:6969", defaultLDap.getServerUrl());
-        assertEquals("@google.fr", defaultLDap.getLoginPostFix());
+        assertEquals(INVALID_LDAP, defaultLDap.getServerUrl());
+        assertEquals(INVALID_POSTFIX, defaultLDap.getLoginPostFix());
     }
 
 
@@ -74,13 +82,13 @@ public class LdapSecurityServiceTest {
     @Test
     public void test_configuration_multi_ldap() throws Exception {
         ContainerConfiguration configuration = new ContainerConfiguration();
-        configuration.setParameter(LdapSecurityService.CONFIG_LDAP_URL_DEFAULT, "ldap://a7sw302:6969");
-        configuration.setParameter(LdapSecurityService.CONFIG_LDAP_POSTFIX_DEFAULT, "@google.fr");
+        configuration.setParameter(LdapSecurityService.CONFIG_LDAP_URL_DEFAULT, INVALID_LDAP);
+        configuration.setParameter(LdapSecurityService.CONFIG_LDAP_POSTFIX_DEFAULT, INVALID_POSTFIX);
 
         configuration.setParameter(LdapSecurityService.CONFIG_OTHER_DOMAINS, "gdo2");
 
         configuration.setParameter(String.format(LdapSecurityService.CONFIG_LDAP_URL_OTHER, "gdo2"),
-                                   "ldap://a7sw305:9696");
+                                   LDAP_URL1);
         configuration.setParameter(String.format(LdapSecurityService.CONFIG_LDAP_POSTFIX_OTHER, "gdo2"),
                                    "@free.fr");
 
@@ -88,11 +96,11 @@ public class LdapSecurityServiceTest {
         Map<String, Ldap> ldaps = securityService.getLdaps();
 
         Ldap defaultLdap = ldaps.get("default");
-        assertEquals("ldap://a7sw302:6969", defaultLdap.getServerUrl());
-        assertEquals("@google.fr", defaultLdap.getLoginPostFix());
+        assertEquals(INVALID_LDAP, defaultLdap.getServerUrl());
+        assertEquals(INVALID_POSTFIX, defaultLdap.getLoginPostFix());
 
         Ldap otherLDap = ldaps.get("gdo2");
-        assertEquals("ldap://a7sw305:9696", otherLDap.getServerUrl());
+        assertEquals(LDAP_URL1, otherLDap.getServerUrl());
         assertEquals("@free.fr", otherLDap.getLoginPostFix());
     }
 
@@ -100,17 +108,17 @@ public class LdapSecurityServiceTest {
     @Test
     public void test_configuration_backup_ldap() throws Exception {
         ContainerConfiguration configuration = new ContainerConfiguration();
-        configuration.setParameter(LdapSecurityService.CONFIG_LDAP_URL_DEFAULT, "ldap://a7sw302:6969");
-        configuration.setParameter(LdapSecurityService.CONFIG_LDAP_POSTFIX_DEFAULT, "@google.fr");
+        configuration.setParameter(LdapSecurityService.CONFIG_LDAP_URL_DEFAULT, INVALID_LDAP);
+        configuration.setParameter(LdapSecurityService.CONFIG_LDAP_POSTFIX_DEFAULT, INVALID_POSTFIX);
 
         configuration.setParameter(LdapSecurityService.CONFIG_BACKUP_SERVERS, "gdo2,gdo3");
 
         configuration.setParameter(String.format(LdapSecurityService.CONFIG_LDAP_URL_OTHER, "gdo2"),
-                                   "ldap://a7sw305:9696");
+                                   LDAP_URL1);
         configuration.setParameter(String.format(LdapSecurityService.CONFIG_LDAP_POSTFIX_OTHER, "gdo2"),
                                    "@free.fr");
         configuration.setParameter(String.format(LdapSecurityService.CONFIG_LDAP_URL_OTHER, "gdo3"),
-                                   "ldap://a7sw306:9696");
+                                   LDAP_URL2);
         configuration.setParameter(String.format(LdapSecurityService.CONFIG_LDAP_POSTFIX_OTHER, "gdo3"),
                                    "@free.fr");
 
@@ -118,15 +126,15 @@ public class LdapSecurityServiceTest {
         Map<String, Ldap> ldaps = securityService.getLdaps();
 
         Ldap defaultLdap = ldaps.get("default");
-        assertEquals("ldap://a7sw302:6969", defaultLdap.getServerUrl());
-        assertEquals("@google.fr", defaultLdap.getLoginPostFix());
+        assertEquals(INVALID_LDAP, defaultLdap.getServerUrl());
+        assertEquals(INVALID_POSTFIX, defaultLdap.getLoginPostFix());
 
         Ldap backup1 = ldaps.get("gdo2");
-        assertEquals("ldap://a7sw305:9696", backup1.getServerUrl());
+        assertEquals(LDAP_URL1, backup1.getServerUrl());
         assertEquals("@free.fr", backup1.getLoginPostFix());
 
         Ldap backup2 = ldaps.get("gdo3");
-        assertEquals("ldap://a7sw306:9696", backup2.getServerUrl());
+        assertEquals(LDAP_URL2, backup2.getServerUrl());
         assertEquals("@free.fr", backup2.getLoginPostFix());
 
         assertEquals(2, defaultLdap.getBackupServers().size());
@@ -137,17 +145,17 @@ public class LdapSecurityServiceTest {
     @Test
     public void test_configuration_backup_ldapOtherDomains() throws Exception {
         ContainerConfiguration configuration = new ContainerConfiguration();
-        configuration.setParameter(LdapSecurityService.CONFIG_LDAP_URL_DEFAULT, "ldap://a7sw302:6969");
-        configuration.setParameter(LdapSecurityService.CONFIG_LDAP_POSTFIX_DEFAULT, "@google.fr");
+        configuration.setParameter(LdapSecurityService.CONFIG_LDAP_URL_DEFAULT, INVALID_LDAP);
+        configuration.setParameter(LdapSecurityService.CONFIG_LDAP_POSTFIX_DEFAULT, INVALID_POSTFIX);
 
         configuration.setParameter(LdapSecurityService.CONFIG_OTHER_DOMAINS, "gdother");
 
         configuration.setParameter(String.format(LdapSecurityService.CONFIG_LDAP_URL_OTHER, "gdother"),
-                                   "ldap://a7sw305:9696");
+                                   LDAP_URL1);
         configuration.setParameter(String.format(LdapSecurityService.CONFIG_LDAP_POSTFIX_OTHER, "gdother"),
                                    "@free.fr");
         configuration.setParameter(String.format(LdapSecurityService.CONFIG_LDAP_URL_OTHER, "gdoBackup"),
-                                   "ldap://a7sw306:9696");
+                                   LDAP_URL2);
         configuration.setParameter(String.format(LdapSecurityService.CONFIG_LDAP_POSTFIX_OTHER, "gdoBackup"),
                                    "@free.fr");
         configuration.setParameter(String.format(LdapSecurityService.CONFIG_BACKUP_SERVERS_OTHER, "gdother"),
@@ -157,15 +165,15 @@ public class LdapSecurityServiceTest {
         Map<String, Ldap> ldaps = securityService.getLdaps();
 
         Ldap defaultLdap = ldaps.get("default");
-        assertEquals("ldap://a7sw302:6969", defaultLdap.getServerUrl());
-        assertEquals("@google.fr", defaultLdap.getLoginPostFix());
+        assertEquals(INVALID_LDAP, defaultLdap.getServerUrl());
+        assertEquals(INVALID_POSTFIX, defaultLdap.getLoginPostFix());
 
         Ldap other = ldaps.get("gdother");
-        assertEquals("ldap://a7sw305:9696", other.getServerUrl());
+        assertEquals(LDAP_URL1, other.getServerUrl());
         assertEquals("@free.fr", other.getLoginPostFix());
 
         Ldap backup = ldaps.get("gdoBackup");
-        assertEquals("ldap://a7sw306:9696", backup.getServerUrl());
+        assertEquals(LDAP_URL2, backup.getServerUrl());
         assertEquals("@free.fr", backup.getLoginPostFix());
 
         assertEquals(1, other.getBackupServers().size());
@@ -176,19 +184,19 @@ public class LdapSecurityServiceTest {
     @Test
     public void test_configuration_backup_hasBackup() throws Exception {
         ContainerConfiguration configuration = new ContainerConfiguration();
-        configuration.setParameter(LdapSecurityService.CONFIG_LDAP_URL_DEFAULT, "ldap://a7sw302:6969");
-        configuration.setParameter(LdapSecurityService.CONFIG_LDAP_POSTFIX_DEFAULT, "@google.fr");
+        configuration.setParameter(LdapSecurityService.CONFIG_LDAP_URL_DEFAULT, INVALID_LDAP);
+        configuration.setParameter(LdapSecurityService.CONFIG_LDAP_POSTFIX_DEFAULT, INVALID_POSTFIX);
 
         configuration.setParameter(LdapSecurityService.CONFIG_BACKUP_SERVERS, "backup1");
 
         configuration.setParameter(String.format(LdapSecurityService.CONFIG_LDAP_URL_OTHER, "backup1"),
-                                   "ldap://a7sw305:9696");
+                                   LDAP_URL1);
         configuration.setParameter(String.format(LdapSecurityService.CONFIG_LDAP_POSTFIX_OTHER, "backup1"),
                                    "@free.fr");
         configuration.setParameter(String.format(LdapSecurityService.CONFIG_BACKUP_SERVERS_OTHER, "backup1"),
                                    "backup2");
         configuration.setParameter(String.format(LdapSecurityService.CONFIG_LDAP_URL_OTHER, "backup2"),
-                                   "ldap://a7sw306:9696");
+                                   LDAP_URL2);
         configuration.setParameter(String.format(LdapSecurityService.CONFIG_LDAP_POSTFIX_OTHER, "backup2"),
                                    "@free.fr");
 
@@ -205,19 +213,19 @@ public class LdapSecurityServiceTest {
     @Test
     public void test_backup_other() throws Exception {
         ContainerConfiguration configuration = new ContainerConfiguration();
-        configuration.setParameter(LdapSecurityService.CONFIG_LDAP_URL_DEFAULT, "ldap://a7sw302:6969");
-        configuration.setParameter(LdapSecurityService.CONFIG_LDAP_POSTFIX_DEFAULT, "@google.fr");
+        configuration.setParameter(LdapSecurityService.CONFIG_LDAP_URL_DEFAULT, INVALID_LDAP);
+        configuration.setParameter(LdapSecurityService.CONFIG_LDAP_POSTFIX_DEFAULT, INVALID_POSTFIX);
 
         configuration.setParameter(LdapSecurityService.CONFIG_OTHER_DOMAINS, "backup1, backup2");
 
         configuration.setParameter(String.format(LdapSecurityService.CONFIG_LDAP_URL_OTHER, "backup1"),
-                                   "ldap://a7sw305:9696");
+                                   LDAP_URL1);
         configuration.setParameter(String.format(LdapSecurityService.CONFIG_LDAP_POSTFIX_OTHER, "backup1"),
                                    "@free.fr");
         configuration.setParameter(String.format(LdapSecurityService.CONFIG_BACKUP_SERVERS_OTHER, "backup1"),
                                    "backup2");
         configuration.setParameter(String.format(LdapSecurityService.CONFIG_LDAP_URL_OTHER, "backup2"),
-                                   "ldap://a7sw305:9696");
+                                   LDAP_URL1);
         configuration.setParameter(String.format(LdapSecurityService.CONFIG_LDAP_POSTFIX_OTHER, "backup2"),
                                    "@free.fr");
 
@@ -261,8 +269,8 @@ public class LdapSecurityServiceTest {
         LdapSecurityService securityService = createService(configuration);
         Ldap defaultLDap = securityService.getLdaps().get(LdapSecurityService.DEFAULT_LDAP);
         assertEquals(Ldap.LDAP_FACTORY, defaultLDap.getContextFactory());
-        assertEquals("ldap://a7sw302:389", defaultLDap.getServerUrl());
-        assertEquals("@AM.AGF.FR", defaultLDap.getLoginPostFix());
+        assertEquals(DEFAULT_LDAP_URL, defaultLDap.getServerUrl());
+        assertEquals(DEFAULT_LDAP_POSTFIX, defaultLDap.getLoginPostFix());
     }
 
 

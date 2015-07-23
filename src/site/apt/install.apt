@@ -18,8 +18,8 @@ Installation
 --------------------------------------------------------------------
 LdapSecurityService.jdbc.login = capri
 LdapSecurityService.jdbc.password = capri_pwd
-LdapSecurityService.ldap.url = ldap://a7sw302:389
-LdapSecurityService.ldap.postfix = @AM.AGF.FR
+LdapSecurityService.ldap.url = ldap://PFM1EU-DC33:389
+LdapSecurityService.ldap.postfix = @EU1.1CORP.ORG
 LdapSecurityService.ldap.factory = com.sun.jndi.ldap.LdapCtxFactory
 --------------------------------------------------------------------
 
