@@ -13,9 +13,9 @@ public class DefaultSecurityGuiConfigurationTest {
 
     @Test
     public void test_getConfiguration_setSplash() throws Exception {
-        String splashImageUrl = "http://agf.fr";
+        String splashImageUrl = "http://mydomain.com";
 
-        securityGuiConfiguration.setSplashImageUrl("http://agf.fr");
+        securityGuiConfiguration.setSplashImageUrl("http://mydomain.com");
         assertSame(splashImageUrl, securityGuiConfiguration.getSplashImageUrl());
 
         try {
