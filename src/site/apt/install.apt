@@ -41,7 +41,7 @@ Développement
 <model>
     <grants>
         <entry>
-            <user name="user_dev"/>
+            <user name="s_focs_dev"/>
             <list>
                 <role name="Administration"/>
             </list>
