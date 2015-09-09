@@ -1,16 +1,12 @@
 package net.codjo.security.gui.user;
+
+import net.codjo.security.common.message.*;
+import net.codjo.util.file.FileUtil;
+
 import java.io.File;
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import net.codjo.security.common.message.DefaultModelManager;
-import net.codjo.security.common.message.ModelManager;
-import net.codjo.security.common.message.Role;
-import net.codjo.security.common.message.User;
-import net.codjo.security.common.message.XmlCodec;
-import net.codjo.util.file.FileUtil;
+import java.util.*;
 
 @SuppressWarnings({"UseOfSystemOutOrSystemErr"})
 public class ExportCsvForAdsMain {
@@ -69,7 +65,10 @@ public class ExportCsvForAdsMain {
             }
             csv.append(NEW_LINE);
 
-            for (User user : model.getUsers()) {
+            Set<User> users = model.getUsers();
+            User[] userArray = users.toArray(new User[users.size()]);
+            Arrays.sort(userArray);
+            for (User user : userArray) {
                 List<Role> userRoles = model.getUserRoles(user);
                 if (model.getUserRoles(user).isEmpty()) {
                     continue;

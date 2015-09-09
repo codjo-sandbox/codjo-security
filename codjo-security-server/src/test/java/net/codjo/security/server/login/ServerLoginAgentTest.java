@@ -1,14 +1,6 @@
 package net.codjo.security.server.login;
-import java.io.Serializable;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
-import net.codjo.agent.AclMessage;
+import net.codjo.agent.*;
 import net.codjo.agent.AclMessage.Performative;
-import net.codjo.agent.Agent;
-import net.codjo.agent.Aid;
-import net.codjo.agent.MessageTemplate;
-import net.codjo.agent.ServiceHelper;
-import net.codjo.agent.UserId;
 import net.codjo.agent.test.AssertMatchExpression;
 import net.codjo.agent.test.Story;
 import net.codjo.agent.test.SubStep;
@@ -25,12 +17,18 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.io.Serializable;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+
 import static net.codjo.agent.test.AgentAssert.log;
 import static net.codjo.test.common.matcher.JUnitMatchers.fail;
 /**
  *
  */
 public class ServerLoginAgentTest {
+    private static final boolean JAVA_8 = System.getProperty("java.version").startsWith("1.8.");
+
     public static final String SERVER_LOGIN_AGENT = "server-login-agent";
     private Story story = new Story();
     private LogString log = new LogString();
@@ -61,11 +59,15 @@ public class ServerLoginAgentTest {
         story.installService(SecurityServiceMock.class);
         story.record().startAgent(SERVER_LOGIN_AGENT, new ServerLoginAgent(sessionManager, "v1"));
 
+        String expectedMessage = "not logged / java.lang.ClassCastException: java.lang.String";
+        if (JAVA_8) {
+            expectedMessage += " cannot be cast to net.codjo.security.common.login.LoginAction";
+        }
         story.record().startTester("a dummy agent")
-              .sendMessage(withBadContent("I'm not a LoginAction"))
+                .sendMessage(withBadContent("I'm not a LoginAction"))
               .then()
-              .receiveMessage()
-              .assertReceivedMessage(loginEvent("not logged / java.lang.ClassCastException: java.lang.String"));
+                .receiveMessage()
+                .assertReceivedMessage(loginEvent(expectedMessage));
 
         story.record().assertContainsAgent(SERVER_LOGIN_AGENT);
 

@@ -1,11 +1,12 @@
 package net.codjo.security.common.message;
+import junit.framework.TestCase;
+import net.codjo.test.common.XmlUtil;
+
 import java.io.StringReader;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
-import junit.framework.TestCase;
-import net.codjo.test.common.XmlUtil;
 
 import static net.codjo.security.common.message.AssertUtil.assertSetEquals;
 import static net.codjo.security.common.message.SecurityEngineConfiguration.adsConfiguration;
@@ -31,7 +32,7 @@ public class XmlCodecTest extends TestCase {
 
         manager.addRoleToUser(guest, smith);
 
-        XmlUtil.assertEquals("<model>"
+        XmlUtil.assertEquivalent("<model>"
                              + "  <roles><role name='guest'/></roles>"
                              + "  <grants>"
                              + "    <entry><user name='kasparov'/><list/></entry>"

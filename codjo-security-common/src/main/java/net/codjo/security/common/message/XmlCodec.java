@@ -1,11 +1,13 @@
 package net.codjo.security.common.message;
+
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.converters.SingleValueConverter;
-import com.thoughtworks.xstream.converters.basic.ThreadSafeSimpleDateFormat;
 import com.thoughtworks.xstream.io.xml.DomDriver;
+
 import java.io.Reader;
 import java.text.ParseException;
 import java.util.Date;
+
 /**
  *
  */
@@ -64,10 +66,15 @@ public class XmlCodec {
         return xstream;
     }
 
+    static interface DateFormatter {
+
+        String format(Date obj);
+
+        Object parse(String str) throws ParseException;
+    }
 
     private static class BugFixConverter implements SingleValueConverter {
-        private ThreadSafeSimpleDateFormat dateFormat = new ThreadSafeSimpleDateFormat("dd/MM/yyyy HH:mm:ss",
-                                                                                       1, 20);
+        private DateFormatter dateFormat = DateFormatterFactory.createDateFormatter("dd/MM/yyyy HH:mm:ss", 1, 20);
 
 
         public String toString(Object obj) {
