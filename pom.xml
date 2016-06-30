@@ -9,11 +9,11 @@
     <parent>
         <groupId>net.codjo.pom</groupId>
         <artifactId>codjo-pom-external</artifactId>
-        <version>2.35</version>
+        <version>3.2-RC1</version>
     </parent>
     <groupId>net.codjo.security</groupId>
     <artifactId>codjo-security</artifactId>
-    <version>0.70</version>
+    <version>1.0-RC1</version>
     <dependencyManagement>
         <dependencies>
             <dependency>

@@ -1,11 +1,12 @@
 package net.codjo.security.common.message;
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.converters.SingleValueConverter;
-import com.thoughtworks.xstream.converters.basic.ThreadSafeSimpleDateFormat;
+import com.thoughtworks.xstream.core.util.ThreadSafeSimpleDateFormat;
 import com.thoughtworks.xstream.io.xml.DomDriver;
 import java.io.Reader;
 import java.text.ParseException;
 import java.util.Date;
+import java.util.TimeZone;
 /**
  *
  */
@@ -66,8 +67,8 @@ public class XmlCodec {
 
 
     private static class BugFixConverter implements SingleValueConverter {
-        private ThreadSafeSimpleDateFormat dateFormat = new ThreadSafeSimpleDateFormat("dd/MM/yyyy HH:mm:ss",
-                                                                                       1, 20);
+        private ThreadSafeSimpleDateFormat dateFormat = new ThreadSafeSimpleDateFormat("dd/MM/yyyy HH:mm:ss", TimeZone.getDefault(),
+                                                                                       1, 20, false);
 
 
         public String toString(Object obj) {
